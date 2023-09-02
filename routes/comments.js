@@ -31,7 +31,7 @@ router.post("/:_postId/comments", async (req, res) => {
 
     const comment = new Comment({ user, password, content, postId: _postId });
     await comment.save();
-
+    //댓글 조회 반환(취향)
     return res.status(201).json({ message: "댓글을 생성하였습니다." });
   } catch (err) {
     if (err.message === '"content" is not allowed to be empty') {

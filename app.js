@@ -3,6 +3,7 @@ import connect from "./schemas/index.js";
 import routes from "./routes/index.js"
 
 import { config } from "dotenv";
+import { errorHandler } from "./utils/errorHandler.js";
 config();
 
 const app = express();
@@ -22,6 +23,7 @@ router.get("/", (req, res) => {
 });
 
 app.use("/", [router, routes]);
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(PORT, "포트로 서버가 열렸어요!");

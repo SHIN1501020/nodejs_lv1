@@ -1,6 +1,9 @@
 import express from "express";
 import Post from "../schemas/post.js";
 import Joi from "joi";
+import { Messages } from "../constants/index.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { validateBody } from "../utils/validation.js";
 
 //joi 게시글 생성 유효성 검사
 const createPostSchema = Joi.object({
@@ -22,24 +25,29 @@ const passwordSchema = Joi.string().required();
 const router = express.Router();
 
 //게시글 생성
-router.post("/", async (req, res) => {
-  //클라이언트에게 전달받은 데이터를 변수에 저장합니다.
-  try {
-    const validation = await createPostSchema.validateAsync(req.body);
-    const { user, password, title, content } = validation;
+// try {
+// const validation = await createPostSchema.validateAsync(req.body);
+    // const { user, password, title, content } = validation;
+    // const post = new Post({ user, password, title, content });
+    // await post.save();
+    // return res.status(201).json({ message: "게시글을 생성하였습니다." });
+    // } catch (err) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: "데이터 형식이 올바르지 않습니다." });
+  // }
+
+router.post("/", validateBody(createPostSchema), asyncHandler(async (req, res) => {
+    const { user, password, title, content } = req.body;
     const post = new Post({ user, password, title, content });
     await post.save();
-    return res.status(201).json({ message: "게시글을 생성하였습니다." });
-  } catch (err) {
-    return res
-      .status(400)
-      .json({ message: "데이터 형식이 올바르지 않습니다." });
-  }
-});
+    return res.status(201).json({ message: Messages.POST_CREATED })
+}));
 
 //전체 게시글 조회
 router.get("/", async (req, res) => {
   //게시글을 createAt 내림차순 기준으로 정렬
+  //DB에서 가져오는게 빠름
   const posts = await Post.find().sort("-createAt").exec();
   console.log(posts);
   const newPosts = posts.map((x) => {
